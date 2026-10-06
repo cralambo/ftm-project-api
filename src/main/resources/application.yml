@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: ftm-project-api
+
+  profiles:
+    active: dev
+
+  security:
+    jwt:
+      secret: zck1JnRGr3aYelGo4ro6Il1TGbR2sWrbbcwJHBEU9W83BRg6WQXkRckAWJNlVStB6LVxBQ5lesquQIfV4g3P4w==
+      expiration: 3600000
+      issuer: ftm-project-api
+
+server:
+  servlet:
+    context-path: /api/v1
+
+# ==========================================
+# APPLICATION
+# ==========================================
+app:
+  mail:
+    from: noreply@tanymeva.org
+    from-name: Fondation Tany Meva
+    frontend-url: http://localhost:5173

@@ -1,0 +1,99 @@
+services:
+  # ftm-project-api database
+  db-project-api:
+    image: postgres:17
+    container_name: ftm-db-project-api
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ftm_project_api_db
+      POSTGRES_USER: ftm_admin
+      POSTGRES_PASSWORD: ftm_password
+
+    ports:
+      - "5444:5432"
+
+    volumes:
+      - db_project_api_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "ftm_admin", "-d", "ftm_project_api_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - ftm-network-project
+
+  # pgadmin for ftm-project-api
+  admin-project-api:
+    image: dpage/pgadmin4:latest
+    container_name: ftm-admin-project-api
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: administrator@tanymeva.org
+      PGADMIN_DEFAULT_PASSWORD: adminFtm2026
+
+    ports:
+      - "5055:80"
+
+    volumes:
+      - admin_project_api_data:/var/lib/pgadmin
+
+    depends_on:
+      - db-project-api
+
+    networks:
+      - ftm-network-project
+
+  # ftm-project-api image
+  project-api-ftm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: project-api-ftm
+    restart: unless-stopped
+
+    ports:
+      - "8095:8095"
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-project-api:5432/ftm_project_api_db
+      SPRING_DATASOURCE_USERNAME: ftm_admin
+      SPRING_DATASOURCE_PASSWORD: ftm_password
+
+    depends_on:
+      db-project-api:
+        condition: service_healthy
+
+    networks:
+      - ftm-network-project
+
+  # mailpit config
+  mail-project-api-ftm:
+    image: axllent/mailpit:latest
+    container_name: ftm-mail-project-api-ftm
+    restart: unless-stopped
+
+    ports:
+      # SMTP
+      - "1028:1025"
+      # INTERFACE WEB
+      - "8028:8025"
+    networks:
+      - ftm-network-project
+
+# database volumes
+volumes:
+  db_project_api_data:
+    name: ftm_db_project_api_data
+
+  admin_project_api_data:
+    name: ftm_admin_project_api_data
+
+# global network
+networks:
+  ftm-network-project:
+    name: ftm-network-project
+    driver: bridge

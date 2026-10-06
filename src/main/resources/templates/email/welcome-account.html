@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Bienvenue sur la plateforme FTM
+    </title>
+
+</head>
+
+<body style="
+    margin: 0;
+    padding: 0;
+    background-color: #f4f6f8;
+    font-family: Arial, Helvetica, sans-serif;
+">
+
+<table width="100%"
+       cellpadding="0"
+       cellspacing="0"
+       border="0"
+       style="background-color: #f4f6f8; padding: 30px 0;">
+
+    <tr>
+
+        <td align="center">
+
+            <table width="600"
+                   cellpadding="0"
+                   cellspacing="0"
+                   border="0"
+                   style="
+                       max-width: 600px;
+                       width: 100%;
+                       background-color: #ffffff;
+                       border-radius: 8px;
+                       overflow: hidden;
+                   ">
+
+                <!-- Header -->
+                <tr>
+
+                    <td style="
+                        background-color: #004D95;
+                        padding: 30px;
+                        text-align: center;
+                    ">
+
+                        <h1 style="
+                            margin: 0;
+                            color: #ffffff;
+                            font-size: 26px;
+                        ">
+                            Fondation Tany Meva
+                        </h1>
+
+                    </td>
+
+                </tr>
+
+                <!-- Content -->
+                <tr>
+
+                    <td style="
+                        padding: 35px;
+                        color: #333333;
+                    ">
+
+                        <h2 style="
+                            margin-top: 0;
+                            color: #004D95;
+                        "
+                            th:text="'Bonjour ' + ${firstname} + ' ' + ${lastname} + ','">
+
+                            Bonjour,
+
+                        </h2>
+
+                        <p style="
+                            font-size: 16px;
+                            line-height: 1.6;
+                        ">
+
+                            Votre compte utilisateur sur la
+                            plateforme de la Fondation Tany Meva
+                            a été créé avec succès.
+
+                        </p>
+
+                        <p style="
+                            font-size: 16px;
+                            line-height: 1.6;
+                        ">
+
+                            Vous trouverez ci-dessous vos
+                            informations de connexion initiales.
+
+                        </p>
+
+                        <!-- Credentials -->
+                        <table width="100%"
+                               cellpadding="0"
+                               cellspacing="0"
+                               border="0"
+                               style="
+                                   margin: 25px 0;
+                                   background-color: #f4f6f8;
+                                   border-radius: 6px;
+                               ">
+
+                            <tr>
+
+                                <td style="
+                                    padding: 20px;
+                                ">
+
+                                    <p style="
+                                        margin: 0 0 10px 0;
+                                        font-size: 14px;
+                                        color: #666666;
+                                    ">
+                                        Adresse email
+                                    </p>
+
+                                    <p style="
+                                        margin: 0 0 20px 0;
+                                        font-size: 16px;
+                                        font-weight: bold;
+                                        color: #333333;
+                                    "
+                                       th:text="${email}">
+
+                                        user@example.com
+
+                                    </p>
+
+                                    <p style="
+                                        margin: 0 0 10px 0;
+                                        font-size: 14px;
+                                        color: #666666;
+                                    ">
+                                        Mot de passe temporaire
+                                    </p>
+
+                                    <p style="
+                                        margin: 0;
+                                        padding: 12px;
+                                        background-color: #ffffff;
+                                        border: 1px solid #dddddd;
+                                        border-radius: 4px;
+                                        font-size: 18px;
+                                        font-weight: bold;
+                                        letter-spacing: 1px;
+                                        color: #004D95;
+                                    "
+                                       th:text="${temporaryPassword}">
+
+                                        Password123!
+
+                                    </p>
+
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                        <!-- Button -->
+                        <table width="100%"
+                               cellpadding="0"
+                               cellspacing="0"
+                               border="0">
+
+                            <tr>
+
+                                <td align="center"
+                                    style="padding: 10px 0 25px 0;">
+
+                                    <a th:href="${frontendUrl}"
+                                       href="#"
+                                       style="
+                                           display: inline-block;
+                                           padding: 14px 28px;
+                                           background-color: #004D95;
+                                           color: #ffffff;
+                                           text-decoration: none;
+                                           border-radius: 5px;
+                                           font-size: 16px;
+                                           font-weight: bold;
+                                       ">
+
+                                        Accéder à la plateforme
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        </table>
+
+                        <p style="
+                            font-size: 14px;
+                            line-height: 1.6;
+                            color: #666666;
+                        ">
+
+                            Pour des raisons de sécurité, nous vous
+                            recommandons de modifier votre mot de passe
+                            après votre première connexion.
+
+                        </p>
+
+                        <p style="
+                            font-size: 14px;
+                            line-height: 1.6;
+                            color: #666666;
+                        ">
+
+                            Si vous n'êtes pas à l'origine de cette
+                            création de compte, veuillez contacter
+                            l'administrateur de la plateforme.
+
+                        </p>
+
+                        <p style="
+                            margin-top: 30px;
+                            font-size: 15px;
+                            line-height: 1.6;
+                        ">
+
+                            Cordialement,<br>
+
+                            <strong>
+                                Fondation Tany Meva
+                            </strong>
+
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+
+                    <td style="
+                        padding: 20px;
+                        text-align: center;
+                        background-color: #f4f6f8;
+                        color: #777777;
+                        font-size: 12px;
+                    ">
+
+                        <p style="margin: 0;">
+                            Fondation Tany Meva
+                        </p>
+
+                        <p style="margin: 5px 0 0 0;">
+                            Cet email a été envoyé automatiquement.
+                            Merci de ne pas y répondre.
+                        </p>
+
+                    </td>
+
+                </tr>
+
+            </table>
+
+        </td>
+
+    </tr>
+
+</table>
+
+</body>
+
+</html>
