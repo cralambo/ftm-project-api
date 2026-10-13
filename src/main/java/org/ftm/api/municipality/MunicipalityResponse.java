@@ -5,7 +5,7 @@ import org.ftm.api.district.ShortDistrictResponse;
 
 @Builder
 public record MunicipalityResponse(
-        String municipality_id,
+        String id,
         String name,
         ShortDistrictResponse district
 ) {

@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ShortSupportPartnerResponse(
-        String support_partner_id,
+        String id,
         String name
 ) {
 }

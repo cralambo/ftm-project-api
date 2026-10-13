@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record BoardMemberResponse(
-        String board_member_id,
+        String id,
         String firstname,
         String lastname,
         String personal_email,

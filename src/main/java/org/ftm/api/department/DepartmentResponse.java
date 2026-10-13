@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record DepartmentResponse(
-        String department_id,
+        String id,
         String code,
         String name,
         String description

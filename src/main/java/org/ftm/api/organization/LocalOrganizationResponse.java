@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record LocalOrganizationResponse(
-        String local_organization_id,
+        String id,
         String name,
         String address,
         String phone,

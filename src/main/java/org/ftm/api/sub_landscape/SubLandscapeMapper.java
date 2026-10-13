@@ -11,9 +11,16 @@ public class SubLandscapeMapper {
 
     public static SubLandscapeResponse mapToSubLandscapeResponse(SubLandscape subLandscape) {
         return SubLandscapeResponse.builder()
-                .sub_landscape_id(subLandscape.getId().toString())
+                .id(subLandscape.getId().toString())
                 .name(subLandscape.getName())
                 .landscape(LandscapeMapper.mapToShortLandscapeResponse(subLandscape.getLandscape()))
+                .build();
+    }
+
+    public static ShortSubLandscapeResponse mapToShortSubLandscapeResponse(SubLandscape subLandscape) {
+        return ShortSubLandscapeResponse.builder()
+                .id(subLandscape.getId().toString())
+                .name(subLandscape.getName())
                 .build();
     }
 }

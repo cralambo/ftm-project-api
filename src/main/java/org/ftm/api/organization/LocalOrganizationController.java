@@ -5,6 +5,7 @@ import org.ftm.api.common.PageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,6 +31,11 @@ public class LocalOrganizationController {
             @RequestParam(name = "size", defaultValue = "10", required = false) int size
     ) {
         return ResponseEntity.ok(organizationService.getOrganizations(page, size));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ShortLocalOrganizationResponse>> getAllLocalOrganizations() {
+        return ResponseEntity.ok(organizationService.getAllLocalOrganizations());
     }
 
     @PutMapping("/update/{organization-id}")

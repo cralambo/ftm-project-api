@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ShortDistrictResponse(
-        String district_id,
+        String id,
         String code,
         String name
 ) {

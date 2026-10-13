@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ShortStrategicPlanResponse(
-        String strategic_plan_id,
+        String id,
         String code
 ) {
 }

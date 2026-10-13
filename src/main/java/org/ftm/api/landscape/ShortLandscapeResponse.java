@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ShortLandscapeResponse(
-        String landscape_id,
+        String id,
         String name
 ) {
 }

@@ -61,4 +61,12 @@ public class LocalOrganizationService {
                 .orElseThrow(() -> new EntityNotFoundException("No local organization found with id: " + organizationId));
         localOrganizationRepository.delete(organization);
     }
+
+    public List<ShortLocalOrganizationResponse> getAllLocalOrganizations() {
+        List<LocalOrganization> localOrganizations = localOrganizationRepository.findAll(Sort.by("createdDate").descending());
+        return localOrganizations
+                .stream()
+                .map(LocalOrganizationMapper::mapToShortLocalOrganization)
+                .toList();
+    }
 }

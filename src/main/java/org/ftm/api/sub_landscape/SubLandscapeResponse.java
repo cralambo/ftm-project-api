@@ -5,7 +5,7 @@ import org.ftm.api.landscape.ShortLandscapeResponse;
 
 @Builder
 public record SubLandscapeResponse(
-        String sub_landscape_id,
+        String id,
         String name,
         ShortLandscapeResponse landscape
 ) {

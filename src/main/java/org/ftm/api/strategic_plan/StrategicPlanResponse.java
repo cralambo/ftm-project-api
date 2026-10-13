@@ -5,7 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record StrategicPlanResponse(
-        String  strategic_plan_id,
+        String  id,
         String name,
         String code,
         String start_date,

@@ -6,7 +6,7 @@ import org.ftm.api.position.ShortPositionResponse;
 
 @Builder
 public record EmployeeResponse(
-        String employee_id,
+        String id,
         String firstname,
         String lastname,
         String employee_number,

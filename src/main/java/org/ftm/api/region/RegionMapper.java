@@ -10,7 +10,7 @@ public class RegionMapper {
 
     public static RegionResponse mapToRegionResponse(Region region) {
         return RegionResponse.builder()
-                .region_id(region.getId().toString())
+                .id(region.getId().toString())
                 .name(region.getName())
                 .build();
     }

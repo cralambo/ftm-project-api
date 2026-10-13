@@ -62,4 +62,12 @@ public class SupportPartnerService {
                 .orElseThrow(() -> new EntityNotFoundException("No support partner found with id: " + partnerId));
         supportPartnerRepository.delete(partner);
     }
+
+    public List<ShortSupportPartnerResponse> getAllPartners() {
+        List<SupportPartner> supportPartners = supportPartnerRepository.findAll(Sort.by("createdDate").descending());
+        return supportPartners
+                .stream()
+                .map(SupportPartnerMapper::mapToShortSupportPartnerResponse)
+                .toList();
+    }
 }

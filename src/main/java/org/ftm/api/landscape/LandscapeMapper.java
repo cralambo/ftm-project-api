@@ -9,14 +9,14 @@ public class LandscapeMapper {
 
     public static LandscapeResponse mapToLandscapeResponse(Landscape landscape) {
         return LandscapeResponse.builder()
-                .landscape_id(landscape.getId().toString())
+                .id(landscape.getId().toString())
                 .name(landscape.getName())
                 .build();
     }
 
     public static ShortLandscapeResponse mapToShortLandscapeResponse(Landscape landscape) {
         return ShortLandscapeResponse.builder()
-                .landscape_id(landscape.getId().toString())
+                .id(landscape.getId().toString())
                 .name(landscape.getName())
                 .build();
     }

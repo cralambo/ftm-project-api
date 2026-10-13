@@ -16,7 +16,7 @@ public class StrategicPlanMapper {
 
     public static StrategicPlanResponse mapToStrategicPlanResponse(StrategicPlan strategicPlan) {
         return StrategicPlanResponse.builder()
-                .strategic_plan_id(strategicPlan.getId().toString())
+                .id(strategicPlan.getId().toString())
                 .name(strategicPlan.getName())
                 .code(strategicPlan.getCode())
                 .start_date(
@@ -35,7 +35,7 @@ public class StrategicPlanMapper {
 
     public static ShortStrategicPlanResponse mapToShortStrategicPlanResponse(StrategicPlan strategicPlan) {
         return ShortStrategicPlanResponse.builder()
-                .strategic_plan_id(strategicPlan.getId().toString())
+                .id(strategicPlan.getId().toString())
                 .code(strategicPlan.getCode())
                 .build();
     }

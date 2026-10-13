@@ -23,7 +23,7 @@ public class BoardMemberMapper {
 
     public static BoardMemberResponse mapToBoardMemberResponse(BoardMember boardMember) {
         return BoardMemberResponse.builder()
-                .board_member_id(boardMember.getId().toString())
+                .id(boardMember.getId().toString())
                 .firstname(boardMember.getFirstname())
                 .lastname(boardMember.getLastname())
                 .personal_email(boardMember.getPersonalEmail())

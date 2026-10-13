@@ -10,7 +10,7 @@ public class PositionMapper {
 
     public static PositionResponse mapToPositionResponse(Position position) {
         return PositionResponse.builder()
-                .position_id(position.getId().toString())
+                .id(position.getId().toString())
                 .code(position.getCode())
                 .name(position.getName())
                 .build();
@@ -18,7 +18,7 @@ public class PositionMapper {
 
     public static ShortPositionResponse mapToShortPositionResponse(Position position) {
         return ShortPositionResponse.builder()
-                .position_id(position.getId().toString())
+                .id(position.getId().toString())
                 .code(position.getCode())
                 .name(position.getName())
                 .build();

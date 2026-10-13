@@ -16,7 +16,7 @@ public class PartnerContactMapper {
 
     public static PartnerContactResponse mapToPartnerContactResponse(PartnerContact partnerContact) {
         return PartnerContactResponse.builder()
-                .partner_contact_id(partnerContact.getId().toString())
+                .id(partnerContact.getId().toString())
                 .firstname(partnerContact.getFirstname())
                 .lastname(partnerContact.getLastname())
                 .email(partnerContact.getEmail())
@@ -28,7 +28,7 @@ public class PartnerContactMapper {
 
     public static ShortPartnerContactResponse mapToShortPartnerContactResponse(PartnerContact partnerContact) {
         return ShortPartnerContactResponse.builder()
-                .partner_contact_id(partnerContact.getId().toString())
+                .id(partnerContact.getId().toString())
                 .firstname(partnerContact.getFirstname())
                 .lastname(partnerContact.getLastname())
                 .build();

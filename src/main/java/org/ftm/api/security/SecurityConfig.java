@@ -35,7 +35,7 @@ public class SecurityConfig {
                         SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/auth/**", "/actuator/health").permitAll()
+                        .requestMatchers( "/auth/**", "/api/v1/auth/**", "/actuator/health").permitAll()
                         .requestMatchers( "/api/v1/users/**" )
                         .authenticated()
                         .requestMatchers( "/api/v1/roles/**" )
@@ -68,6 +68,10 @@ public class SecurityConfig {
                         .authenticated()
                         .requestMatchers( "/api/v1/strategic-plans/**" )
                         .authenticated()
+                        .requestMatchers( "/api/v1/topics/**" )
+                        .authenticated()
+                        .requestMatchers( "/api/v1/co-funders/**" )
+                        .authenticated()
                         .anyRequest()
                         .authenticated()
                 )
@@ -90,7 +94,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:3000", "http://localhost:5173")
+                List.of("http://localhost:3000", "http://localhost:5173", "http://localhost:4000")
         );
 
         configuration.setAllowedMethods(

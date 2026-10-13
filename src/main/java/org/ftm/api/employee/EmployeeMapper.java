@@ -23,7 +23,7 @@ public class EmployeeMapper {
 
     public static EmployeeResponse mapToEmployeeResponse(Employee employee) {
         return EmployeeResponse.builder()
-                .employee_id(employee.getId().toString())
+                .id(employee.getId().toString())
                 .firstname(employee.getFirstname())
                 .lastname(employee.getLastname())
                 .employee_number(employee.getEmployeeNumber())

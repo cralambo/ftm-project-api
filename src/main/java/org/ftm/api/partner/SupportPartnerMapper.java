@@ -13,7 +13,7 @@ public class SupportPartnerMapper {
 
     public static SupportPartnerResponse mapToPartnerResponse(SupportPartner supportPartner) {
         return SupportPartnerResponse.builder()
-                .support_partner_id(supportPartner.getId().toString())
+                .id(supportPartner.getId().toString())
                 .name(supportPartner.getName())
                 .address(supportPartner.getAddress())
                 .phone(supportPartner.getPhone())
@@ -23,7 +23,7 @@ public class SupportPartnerMapper {
 
     public static ShortSupportPartnerResponse mapToShortSupportPartnerResponse(SupportPartner supportPartner) {
         return ShortSupportPartnerResponse.builder()
-                .support_partner_id(supportPartner.getId().toString())
+                .id(supportPartner.getId().toString())
                 .name(supportPartner.getName())
                 .build();
     }

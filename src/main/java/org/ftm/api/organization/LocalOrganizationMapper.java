@@ -13,11 +13,18 @@ public class LocalOrganizationMapper {
 
     public static LocalOrganizationResponse mapToOrganizationResponse(LocalOrganization localOrganization) {
         return LocalOrganizationResponse.builder()
-                .local_organization_id(localOrganization.getId().toString())
+                .id(localOrganization.getId().toString())
                 .name(localOrganization.getName())
                 .address(localOrganization.getAddress())
                 .phone(localOrganization.getPhone())
                 .email(localOrganization.getEmail())
+                .build();
+    }
+
+    public static ShortLocalOrganizationResponse mapToShortLocalOrganization(LocalOrganization localOrganization) {
+        return ShortLocalOrganizationResponse.builder()
+                .id(localOrganization.getId().toString())
+                .name(localOrganization.getName())
                 .build();
     }
 }

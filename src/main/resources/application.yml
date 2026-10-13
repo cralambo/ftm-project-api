@@ -23,3 +23,7 @@ app:
     from: noreply@tanymeva.org
     from-name: Fondation Tany Meva
     frontend-url: http://localhost:5173
+
+  security:
+    refresh-token-expiration: 604800
+    cookie-secure: false

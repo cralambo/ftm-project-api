@@ -5,6 +5,7 @@ import org.ftm.api.common.PageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +23,11 @@ public class SupportPartnerController {
     @GetMapping("/{partner-id}")
     public ResponseEntity<SupportPartnerResponse> getPartnerById(@PathVariable("partner-id") UUID partnerId) {
         return ResponseEntity.ok(supportPartnerService.getPartnerById(partnerId));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ShortSupportPartnerResponse>> getAllPartners() {
+        return ResponseEntity.ok(supportPartnerService.getAllPartners());
     }
 
     @GetMapping

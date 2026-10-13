@@ -12,7 +12,7 @@ public class DepartmentMapper{
 
     public static DepartmentResponse mapToDepartmentResponse(Department department) {
         return DepartmentResponse.builder()
-                .department_id(department.getId().toString())
+                .id(department.getId().toString())
                 .code(department.getCode())
                 .name(department.getName())
                 .description(department.getDescription())
@@ -21,7 +21,7 @@ public class DepartmentMapper{
 
     public static ShortDepartmentResponse mapToShortDepartmentResponse(Department department) {
         return ShortDepartmentResponse.builder()
-                .department_id(department.getId().toString())
+                .id(department.getId().toString())
                 .code(department.getCode())
                 .name(department.getName())
                 .build();

@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record RegionResponse(
-        String region_id,
+        String id,
         String name
 ) {
 }

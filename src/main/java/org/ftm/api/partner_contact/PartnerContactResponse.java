@@ -5,7 +5,7 @@ import org.ftm.api.partner.ShortSupportPartnerResponse;
 
 @Builder
 public record PartnerContactResponse(
-        String partner_contact_id,
+        String id,
         String firstname,
         String lastname,
         String email,

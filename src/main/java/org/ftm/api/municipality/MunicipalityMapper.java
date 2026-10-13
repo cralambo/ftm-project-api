@@ -10,7 +10,7 @@ public class MunicipalityMapper {
 
     public static MunicipalityResponse mapToMunicipalityResponse(Municipality municipality) {
         return MunicipalityResponse.builder()
-                .municipality_id(municipality.getId().toString())
+                .id(municipality.getId().toString())
                 .name(municipality.getName())
                 .district(DistrictMapper.mapToShortDistrictResponse(municipality.getDistrict()))
                 .build();
@@ -18,7 +18,7 @@ public class MunicipalityMapper {
 
     public static ShortMunicipalityResponse mapToShortMunicipalityResponse(Municipality municipality) {
         return ShortMunicipalityResponse.builder()
-                .municipality_id(municipality.getId().toString())
+                .id(municipality.getId().toString())
                 .name(municipality.getName())
                 .build();
     }
