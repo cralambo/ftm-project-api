@@ -1,5 +1,7 @@
 package org.ftm.api.disbursement_schedule;
 
+import org.ftm.api.project.ProjectMapper;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -55,7 +57,7 @@ public class DisbursementScheduleMapper {
                                 ? schedule.getReportSubmissionDate().toString()
                                 : null
                 )
-                .project_id(schedule.getProject().getId().toString())
+                .project(ProjectMapper.mapToProjectResponse(schedule.getProject()))
                 .build();
     }
 }

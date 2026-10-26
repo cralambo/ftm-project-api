@@ -22,4 +22,10 @@ public class DisbursementScheduleService {
         disbursementSchedule.setProject(project);
         return disbursementScheduleRepository.save(disbursementSchedule).getId().toString();
     }
+
+    public DisbursementScheduleResponse getScheduleById(UUID scheduleId) {
+        return disbursementScheduleRepository.findWithDetailsById(scheduleId)
+                .map(DisbursementScheduleMapper::mapToDisbursementScheduleResponse)
+                .orElseThrow(() -> new EntityNotFoundException("No disbursement schedule found with id:: " + scheduleId));
+    }
 }

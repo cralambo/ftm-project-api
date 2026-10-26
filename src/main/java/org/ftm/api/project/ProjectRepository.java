@@ -46,4 +46,19 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
         WHERE p.id = :id
         """)
     Optional<Project> findByIdWithAllRelations(@Param("id") UUID id);
+
+    @EntityGraph(attributePaths = {
+            "supportPartner",
+            "grantedProject"
+    })
+    @Query("""
+        SELECT p
+        FROM Project p
+        WHERE p.supportPartner.id = :supportPartnerId
+        ORDER BY p.createdDate DESC
+        """)
+    Page<Project> findBySupportPartnerId(
+            @Param("supportPartnerId") UUID supportPartnerId,
+            Pageable pageable
+    );
 }

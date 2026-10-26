@@ -1,6 +1,9 @@
 spring:
   application:
     name: ftm-project-api
+  flyway:
+    placeholders:
+      admin-password-hash: $2a$12$uuDNUZV4GcFyqTKbHEoVu.E.1RA22Bd.q30TNO2BLfQaDJgOInp4C
 
   profiles:
     active: dev

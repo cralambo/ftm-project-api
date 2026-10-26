@@ -19,9 +19,12 @@ import org.ftm.api.organization.LocalOrganization;
 import org.ftm.api.organization.LocalOrganizationRepository;
 import org.ftm.api.partner.SupportPartner;
 import org.ftm.api.partner.SupportPartnerRepository;
+import org.ftm.api.partner_contact.PartnerContact;
+import org.ftm.api.partner_contact.PartnerContactRepository;
 import org.ftm.api.project_co_funder.ProjectCoFunder;
 import org.ftm.api.region.Region;
 import org.ftm.api.region.RegionRepository;
+import org.ftm.api.security.CustomUserDetails;
 import org.ftm.api.strategic_plan.StrategicPlan;
 import org.ftm.api.strategic_plan.StrategicPlanRepository;
 import org.ftm.api.sub_landscape.SubLandscape;
@@ -31,6 +34,7 @@ import org.ftm.api.topic.TopicRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +63,7 @@ public class ProjectService {
     private final CoFunderRepository coFunderRepository;
     private final GrantedProjectRepository grantedProjectRepository;
     private final DisbursementScheduleRepository disbursementScheduleRepository;
+    private final PartnerContactRepository partnerContactRepository;
 
     @Transactional
     public String createProject(ProjectRequest request) {
@@ -224,5 +229,25 @@ public class ProjectService {
         return projectRepository.findByIdWithAllRelations(projectId)
                 .map(ProjectMapper::mapToProjectDetailResponse)
                 .orElseThrow(() -> new EntityNotFoundException("No project found with id: " + projectId));
+    }
+
+    public PageResponse<ProjectResponse> getMyProjects(UUID userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        PartnerContact contact = partnerContactRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("No partner contact with user: " + userId));
+        UUID supportPartnerId = contact.getSupportPartner().getId();
+        Page<Project> projects = projectRepository.findBySupportPartnerId(supportPartnerId, pageable);
+        List<ProjectResponse> content = projects.stream()
+                .map(ProjectMapper::mapToProjectResponse)
+                .toList();
+        return PageResponse.<ProjectResponse>builder()
+                .content(content)
+                .number(projects.getNumber())
+                .size(projects.getSize())
+                .totalElements(projects.getTotalElements())
+                .totalPages(projects.getTotalPages())
+                .first(projects.isFirst())
+                .last(projects.isLast())
+                .build();
     }
 }
