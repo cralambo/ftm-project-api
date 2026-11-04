@@ -7,10 +7,12 @@ import org.ftm.api.role.Role;
 import org.ftm.api.role.RoleRepository;
 import org.ftm.api.role.UserRole;
 import org.ftm.api.role.UserRoleId;
+import org.ftm.api.security.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -112,5 +114,17 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("No user found with id: " + userId));
         user.getUserRoles().removeIf(userRole -> userRole.getRole().getId().equals(roleId));
         return userRepository.save(user).getId().toString();
+    }
+
+    public UserResponse getCurrentUser(CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            throw new AuthenticationCredentialsNotFoundException("Utilisateur non authentifié");
+        }
+
+        UUID userId = userDetails.getId();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("No user found with id: " + userId));
+        return null;
     }
 }

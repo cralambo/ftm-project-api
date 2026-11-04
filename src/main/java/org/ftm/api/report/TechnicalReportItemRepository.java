@@ -27,4 +27,9 @@ public interface TechnicalReportItemRepository extends JpaRepository<TechnicalRe
             UUID partnerReportId,
             UUID activityId
     );
+
+    Optional<TechnicalReportItem> findByIdAndPartnerReportId(
+            UUID technicalItemId,
+            UUID reportId
+    );
 }

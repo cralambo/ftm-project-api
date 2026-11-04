@@ -63,6 +63,11 @@ services:
       SPRING_DATASOURCE_USERNAME: ftm_admin
       SPRING_DATASOURCE_PASSWORD: ftm_password
 
+      REPORT_STORAGE_DIR: /var/lib/ftm/report-attachments
+
+    volumes:
+      - ftm_report_attachments:/var/lib/ftm/report-attachments
+
     depends_on:
       db-project-api:
         condition: service_healthy
@@ -91,6 +96,9 @@ volumes:
 
   admin_project_api_data:
     name: ftm_admin_project_api_data
+
+  ftm_report_attachments:
+    name: ftm_report_attachments
 
 # global network
 networks:

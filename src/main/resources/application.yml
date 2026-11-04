@@ -13,6 +13,10 @@ spring:
       secret: zck1JnRGr3aYelGo4ro6Il1TGbR2sWrbbcwJHBEU9W83BRg6WQXkRckAWJNlVStB6LVxBQ5lesquQIfV4g3P4w==
       expiration: 3600000
       issuer: ftm-project-api
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 52MB
 
 server:
   servlet:
@@ -30,3 +34,7 @@ app:
   security:
     refresh-token-expiration: 604800
     cookie-secure: false
+
+  storage:
+    reports:
+      directory: ${REPORT_STORAGE_DIR:/var/lib/ftm/report-attachments}

@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,7 +31,7 @@ public class FinancialSummaryService {
 
         if (budget == null) {
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    HttpStatus.UNPROCESSABLE_CONTENT,
                     "No disbursement schedule found"
             );
         }
@@ -82,20 +83,69 @@ public class FinancialSummaryService {
     @Transactional(readOnly = true)
     public void validateBudgetForSubmission(UUID reportId) {
 
+        validateFinancialItems(reportId);
+
         FinancialSummaryDto summary = calculate(reportId);
 
-        if (new BigDecimal(summary.budget_amount()).compareTo(ZERO) <= 0) {
+        BigDecimal budget = new BigDecimal(summary.budget_amount());
+        BigDecimal expenses = new BigDecimal(summary.total_expenses());
+
+        if (budget.compareTo(ZERO) <= 0) {
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    HttpStatus.UNPROCESSABLE_CONTENT,
                     "Le budget doit être strictement positif pour soumettre le rapport."
             );
         }
 
-        if (new BigDecimal(summary.total_expenses()).compareTo(new BigDecimal(summary.budget_amount())) > 0) {
+        if (expenses.compareTo(ZERO) < 0) {
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    "La soumission est impossible : les dépenses dépassent le budget autorisé."
+                    HttpStatus.UNPROCESSABLE_CONTENT,
+                    "Le montant total des dépenses ne peut pas être négatif."
             );
+        }
+
+        if (expenses.compareTo(budget) > 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_CONTENT,
+                    "La soumission est impossible : les dépenses dépassent le budget autorisé. "
+                            + "Budget : " + budget.toPlainString()
+                            + ", dépenses : " + expenses.toPlainString()
+            );
+        }
+    }
+
+    private void validateFinancialItems(UUID reportId) {
+
+        List<FinancialReportItem> items = financialReportItemRepository.findByPartnerReportId(reportId);
+
+        if (items.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_CONTENT,
+                    "Le rapport financier doit contenir au moins une dépense."
+            );
+        }
+
+        for (FinancialReportItem item: items) {
+            if (item.getDesignation() == null || item.getDesignation().isBlank()) {
+                throw new ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_CONTENT,
+                        "Une dépense ne possède pas de désignation."
+                );
+            }
+
+            if (item.getQuantity() == null || item.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_CONTENT,
+                        "La quantité doit être supérieure à zéro."
+                );
+            }
+
+            if (item.getUnitAmount() == null || item.getUnitAmount().compareTo(BigDecimal.ZERO) < 0) {
+                throw new ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_CONTENT,
+                        "Le montant unitaire ne peut pas être négatif."
+                );
+            }
         }
     }
 }

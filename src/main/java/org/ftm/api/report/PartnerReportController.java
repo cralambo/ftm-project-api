@@ -27,6 +27,14 @@ public class PartnerReportController {
         return ResponseEntity.ok(partnerReportService.createReport(request, userDetails));
     }
 
+    @PostMapping("/initialize")
+    public ResponseEntity<PartnerReportResponse> initializeReport(
+            @Valid @RequestBody CreatePartnerReportRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(partnerReportService.initializeReport(request, userDetails));
+    }
+
     @GetMapping("/{report-id}")
     public ResponseEntity<PartnerReportResponse> getReportById(
             @PathVariable("report-id") UUID reportId,
@@ -67,6 +75,15 @@ public class PartnerReportController {
     ){
         partnerReportService.deleteReport(reportId, userDetails);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{report-id}/submit")
+    public ResponseEntity<PartnerReportResponse> submitReport(
+            @PathVariable("report-id") UUID reportId,
+            @RequestBody SubmitPartnerReportRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(partnerReportService.submitReport(reportId, request,userDetails));
     }
 
 

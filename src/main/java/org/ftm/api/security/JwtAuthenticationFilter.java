@@ -193,11 +193,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .getContext()
                 .setAuthentication(authentication);
 
-        log.debug(
-                "JWT authentication successful for user: {}",
-                username
-        );
-
         filterChain.doFilter(request, response);
     }
 }

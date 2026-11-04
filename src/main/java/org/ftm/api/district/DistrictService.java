@@ -35,7 +35,7 @@ public class DistrictService {
     }
 
     public PageResponse<DistrictResponse> getDistricts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("code").ascending());
         Page<District> districts = districtRepository.findAll(pageable);
         List<DistrictResponse> content = districts
                 .stream()

@@ -35,4 +35,18 @@ public interface ReportAttachmentRepository extends JpaRepository<ReportAttachme
             UUID reportId,
             UUID financialItemId
     );
+
+    List<ReportAttachment> findByPartnerReportIdOrderByUploadedAtDesc(
+            UUID reportId
+    );
+
+    List<ReportAttachment> findByPartnerReportIdAndTechnicalReportItemIdOrderByUploadedAtDesc(
+            UUID reportId,
+            UUID technicalItemId
+    );
+
+    List<ReportAttachment> findByPartnerReportIdAndFinancialReportItemIdOrderByUploadedAtDesc(
+            UUID partnerReportId,
+            UUID financialItemId
+    );
 }

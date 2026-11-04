@@ -59,6 +59,9 @@ public class ReportAttachment {
     @Column(name = "original_filename", nullable = false, length = 255)
     private String originalFilename;
 
+    @Column(name = "name", nullable = false, length = 150)
+    private String name;
+
     @Column(name = "storage_key", nullable = false, unique = true, columnDefinition = "TEXT")
     private String storageKey;
 
@@ -68,8 +71,9 @@ public class ReportAttachment {
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "document_type", length = 50)
-    private String documentType;
+    private ReportAttachmentType documentType;
 
     @Column(columnDefinition = "TEXT")
     private String description;

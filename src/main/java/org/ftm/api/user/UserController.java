@@ -2,7 +2,9 @@ package org.ftm.api.user;
 
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.common.PageResponse;
+import org.ftm.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -72,5 +74,12 @@ public class UserController {
             @PathVariable("role-id") UUID roleId
     ) {
         return ResponseEntity.ok(userService.removeRole(userId, roleId));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ResponseEntity.ok(userService.getCurrentUser(userDetails));
     }
 }

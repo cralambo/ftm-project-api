@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface DisbursementActivityRepository extends JpaRepository<DisbursementActivity, UUID> {
     List<DisbursementActivity> findByDisbursementScheduleIdOrderByIdAsc(UUID disbursementScheduleId);
     boolean existsByDisbursementScheduleIdAndNameIgnoreCase(UUID disbursementScheduleId, String name);
+
+    List<DisbursementActivity> findByDisbursementScheduleId(UUID disbursementScheduleId);
 }
