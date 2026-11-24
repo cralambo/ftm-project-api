@@ -1,9 +1,13 @@
 
 package org.ftm.api.report;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.user.User;
 import org.ftm.api.user.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -12,6 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +43,9 @@ public class ReportAttachmentService {
     private final FinancialReportItemRepository financialReportItemRepository;
     private final UserRepository userRepository;
     private final ReportAttachmentStorageService reportAttachmentStorageService;
+
+    @Value("${app.storage.reports.directory}")
+    private String uploadDir;
 
     /**
      * Upload d'une pièce jointe globale, technique ou financière.
@@ -383,5 +393,26 @@ public class ReportAttachmentService {
                 )
                 .map(this::toDto)
                 .toList();
+    }
+
+    public ReportAttachment getAttachment(UUID attachmentId) {
+        return reportAttachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Attachment not found: " + attachmentId));
+    }
+
+    public Resource getAttachmentContent(UUID attachmentId) {
+        ReportAttachment attachment = getAttachment(attachmentId);
+
+        Path filePath = Paths.get(uploadDir).resolve(attachment.getStorageKey()).normalize();
+
+        try {
+            Resource resource = new UrlResource(filePath.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new EntityNotFoundException("Attachment file not found");
+            }
+            return resource;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Could not read attachment file");
+        }
     }
 }

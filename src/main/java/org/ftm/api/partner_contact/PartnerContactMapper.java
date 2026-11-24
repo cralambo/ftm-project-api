@@ -1,6 +1,7 @@
 package org.ftm.api.partner_contact;
 
 import org.ftm.api.partner.SupportPartnerMapper;
+import org.ftm.api.profile.PartnerContactProfileResponse;
 
 public class PartnerContactMapper {
 
@@ -31,6 +32,20 @@ public class PartnerContactMapper {
                 .id(partnerContact.getId().toString())
                 .firstname(partnerContact.getFirstname())
                 .lastname(partnerContact.getLastname())
+                .build();
+    }
+
+    public static PartnerContactProfileResponse mapToPartnerContactProfileResponse(PartnerContact partnerContact) {
+        return PartnerContactProfileResponse.builder()
+                .id(partnerContact.getId().toString())
+                .firstname(partnerContact.getFirstname())
+                .lastname(partnerContact.getLastname())
+                .email(partnerContact.getEmail())
+                .phone(partnerContact.getPhone())
+                .address(partnerContact.getAddress())
+                .supportPartner(
+                        SupportPartnerMapper.mapToShortSupportPartnerResponse(partnerContact.getSupportPartner())
+                )
                 .build();
     }
 }

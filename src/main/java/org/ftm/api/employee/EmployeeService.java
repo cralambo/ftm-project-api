@@ -7,6 +7,7 @@ import org.ftm.api.department.Department;
 import org.ftm.api.department.DepartmentRepository;
 import org.ftm.api.position.Position;
 import org.ftm.api.position.PositionRepository;
+import org.ftm.api.profile.EmployeeProfileResponse;
 import org.ftm.api.user.User;
 import org.ftm.api.user.UserAccountService;
 import org.springframework.data.domain.Page;
@@ -113,5 +114,11 @@ public class EmployeeService {
         final Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new EntityNotFoundException("No employee found with id: " + employeeId));
         employeeRepository.delete(employee);
+    }
+
+    public EmployeeProfileResponse getByUserId(UUID userId) {
+        return employeeRepository.findByUserId(userId)
+                .map(EmployeeMapper::mapToEmployeeProfileResponse)
+                .orElseThrow(() -> new EntityNotFoundException("No employee found with id: " + userId));
     }
 }

@@ -2,6 +2,7 @@ package org.ftm.api.employee;
 
 import org.ftm.api.department.DepartmentMapper;
 import org.ftm.api.position.PositionMapper;
+import org.ftm.api.profile.EmployeeProfileResponse;
 
 import java.time.LocalDate;
 
@@ -23,6 +24,23 @@ public class EmployeeMapper {
 
     public static EmployeeResponse mapToEmployeeResponse(Employee employee) {
         return EmployeeResponse.builder()
+                .id(employee.getId().toString())
+                .firstname(employee.getFirstname())
+                .lastname(employee.getLastname())
+                .employee_number(employee.getEmployeeNumber())
+                .acronym(employee.getAcronym())
+                .address(employee.getAddress())
+                .personal_email(employee.getPersonalEmail())
+                .professional_email(employee.getProfessionalEmail())
+                .phone(employee.getPhone())
+                .hire_date(employee.getHireDate().toString())
+                .department(DepartmentMapper.mapToShortDepartmentResponse(employee.getDepartment()))
+                .position(PositionMapper.mapToShortPositionResponse(employee.getPosition()))
+                .build();
+    }
+
+    public static EmployeeProfileResponse mapToEmployeeProfileResponse(Employee employee) {
+        return EmployeeProfileResponse.builder()
                 .id(employee.getId().toString())
                 .firstname(employee.getFirstname())
                 .lastname(employee.getLastname())

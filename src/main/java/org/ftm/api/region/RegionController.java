@@ -3,6 +3,7 @@ package org.ftm.api.region;
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.common.PageResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +17,13 @@ public class RegionController {
     private final RegionService regionService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('regions.create')")
     public ResponseEntity<String> createRegion(@RequestBody RegionRequest request) {
         return ResponseEntity.ok(regionService.createRegion(request));
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('regions.view')")
     public ResponseEntity<PageResponse<RegionResponse>> getRegions(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size
@@ -29,16 +32,19 @@ public class RegionController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('regions.view')")
     public ResponseEntity<List<RegionResponse>> getAllRegions() {
         return ResponseEntity.ok(regionService.getAllRegions());
     }
 
     @GetMapping("/{region-id}")
+    @PreAuthorize("hasAuthority('regions.view')")
     public ResponseEntity<RegionResponse> getRegionById(@PathVariable("region-id") UUID regionId) {
         return ResponseEntity.ok(regionService.getRegionById(regionId));
     }
 
     @PutMapping("/update/{region-id}")
+    @PreAuthorize("hasAuthority('regions.update')")
     public ResponseEntity<String> updateRegion(
             @PathVariable("region-id") UUID regionId,
             @RequestBody RegionRequest request
@@ -47,6 +53,7 @@ public class RegionController {
     }
 
     @DeleteMapping("/{region-id}")
+    @PreAuthorize("hasAuthority('regions.delete')")
     public ResponseEntity<Void> deleteRegion(@PathVariable("region-id") UUID regionId) {
         regionService.deleteRegion(regionId);
         return ResponseEntity.noContent().build();

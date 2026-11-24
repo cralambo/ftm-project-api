@@ -3,6 +3,7 @@ package org.ftm.api.employee;
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.common.PageResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -15,16 +16,19 @@ public class EmployeeController {
     private final EmployeeService employeeService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('employees.create')")
     public ResponseEntity<String> createEmployee(@RequestBody EmployeeRequest request) {
         return ResponseEntity.ok(employeeService.createEmployee(request));
     }
 
     @GetMapping("/{employee-id}")
+    @PreAuthorize("hasAuthority('employees.view')")
     public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable("employee-id") UUID employeeId) {
         return ResponseEntity.ok(employeeService.getEmployeeById(employeeId));
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('employees.view')")
     public ResponseEntity<PageResponse<EmployeeResponse>> getEmployees(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size
@@ -33,6 +37,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/update/{employee-id}")
+    @PreAuthorize("hasAuthority('employees.update')")
     public ResponseEntity<String> updateEmployee(
             @PathVariable("employee-id") UUID employeeId,
             @RequestBody EmployeeRequest request
@@ -41,6 +46,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{employee-id}")
+    @PreAuthorize("hasAuthority('employees.delete')")
     public ResponseEntity<Void> deleteEmployee(@PathVariable("employee-id") UUID employeeId) {
         employeeService.deleteEmployee(employeeId);
         return ResponseEntity.noContent().build();

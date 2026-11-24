@@ -2,7 +2,9 @@ package org.ftm.api.report;
 
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.security.CustomUserDetails;
+import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,7 @@ public class ReportAttachmentController {
             value = "/{report-id}/attachments",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @PreAuthorize("hasAuthority('reports.attachments.general.upload')")
     public ResponseEntity<ReportAttachmentDto> uploadGeneral(
             @PathVariable("report-id") UUID reportId,
             @RequestPart("file")MultipartFile file,
@@ -44,6 +47,7 @@ public class ReportAttachmentController {
             value = "/{report-id}/technical-items/{item-id}/attachments",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @PreAuthorize("hasAuthority('reports.attachments.technical.upload')")
     public ResponseEntity<ReportAttachmentDto> uploadTechnical(
             @PathVariable("report-id") UUID reportId,
             @PathVariable("item-id") UUID itemId,
@@ -61,6 +65,7 @@ public class ReportAttachmentController {
             value = "/{report-id}/financial-items/{item-id}/attachments",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @PreAuthorize("hasAuthority('reports.attachments.financial.upload')")
     public ResponseEntity<ReportAttachmentDto> uploadFinancial(
             @PathVariable("report-id") UUID reportId,
             @PathVariable("item-id") UUID itemId,
@@ -75,11 +80,13 @@ public class ReportAttachmentController {
     }
 
     @GetMapping("/{report-id}/attachments")
+    @PreAuthorize("hasAuthority('reports.attachments.general.view')")
     public ResponseEntity<List<ReportAttachmentDto>> listGeneral(@PathVariable("report-id") UUID reportId) {
         return ResponseEntity.ok(reportAttachmentService.list(reportId, null, null));
     }
 
     @GetMapping("/{report-id}/financial-items/{item-id}/attachments")
+    @PreAuthorize("hasAuthority('reports.attachments.financial.view')")
     public ResponseEntity<List<ReportAttachmentDto>> listFinancial(
             @PathVariable("report-id") UUID reportId,
             @PathVariable("item-id") UUID itemId
@@ -88,6 +95,7 @@ public class ReportAttachmentController {
     }
 
     @GetMapping("/{report-id}/technical-items/{item-id}/attachments")
+    @PreAuthorize("hasAuthority('reports.attachments.technical.view')")
     public ResponseEntity<List<ReportAttachmentDto>> listTechnical(
             @PathVariable("report-id") UUID reportId,
             @PathVariable("item-id") UUID itemId
@@ -96,6 +104,7 @@ public class ReportAttachmentController {
     }
 
     @GetMapping("/{report-id}/attachments/{attachment-id}/download")
+    @PreAuthorize("hasAuthority('reports.attachments.download')")
     public ResponseEntity<StreamingResponseBody> download(
             @PathVariable("report-id") UUID reportId,
             @PathVariable("attachment-id") UUID attachmentId
@@ -135,6 +144,26 @@ public class ReportAttachmentController {
                         disposition.toString()
                 )
                 .body(responseBody);
+    }
+
+    @GetMapping("/attachments/{attachment-id}/content")
+    public ResponseEntity<Resource> getAttachmentContent(@PathVariable("attachment-id") UUID attachmentId) {
+        ReportAttachment attachment = reportAttachmentService.getAttachment(attachmentId);
+        Resource resource = reportAttachmentService.getAttachmentContent(attachmentId);
+
+        String contentType = attachment.getContentType() != null
+                ? attachment.getContentType()
+                : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(attachment.getOriginalFilename())
+                                .build()
+                                .toString()
+                )
+                .body(resource);
     }
 
     private MediaType parseContentType(String contentType) {

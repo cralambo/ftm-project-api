@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ftm.api.refresh_token.RefreshToken;
 import org.ftm.api.refresh_token.RefreshTokenRepository;
 import org.ftm.api.security.CustomUserDetails;
@@ -33,6 +34,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private static final String REFRESH_COOKIE = "refresh_token";
@@ -226,15 +228,18 @@ public class AuthService {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {
+            log.warn("No cookies received");
             return null;
         }
 
         for (Cookie cookie : cookies) {
             if (REFRESH_COOKIE.equals(cookie.getName())) {
+                log.info("Refresh token found");
                 return cookie.getValue();
             }
         }
-
+        log.warn("Refresh token not found for URI: {}",
+                request.getRequestURI());
         return null;
     }
 

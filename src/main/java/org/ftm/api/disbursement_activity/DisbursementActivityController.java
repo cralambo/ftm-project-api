@@ -3,6 +3,7 @@ package org.ftm.api.disbursement_activity;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class DisbursementActivityController {
 
     /** Acitivités d'un calendrier de décaissement */
     @GetMapping("/{schedule-id}/activities")
+    @PreAuthorize("hasAuthority('disbursements.activities.view')")
     public ResponseEntity<List<DisbursementActivityResponse>> getActivitiesByScheduleId(
             @PathVariable("schedule-id") UUID disbursementScheduleId
     ) {
@@ -25,6 +27,7 @@ public class DisbursementActivityController {
 
     /** Ajoute une activité (quantitative ou qualitative) à un calendrier */
     @PostMapping("/{schedule-id}/activities")
+    @PreAuthorize("hasAuthority('disbursements.activities.create')")
     public ResponseEntity<DisbursementActivityResponse> createActivity(
             @PathVariable("schedule-id") UUID scheduleId,
             @Valid @RequestBody DisbursementActivityRequest request
@@ -33,11 +36,13 @@ public class DisbursementActivityController {
     }
 
     @GetMapping("/{activity-id}")
+    @PreAuthorize("hasAuthority('disbursements.activities.view')")
     public ResponseEntity<DisbursementActivityResponse> getActivityById(@PathVariable("activity-id") UUID activityId) {
         return ResponseEntity.ok(disbursementActivityService.getActivityById(activityId));
     }
 
     @PutMapping("/{activity-id}")
+    @PreAuthorize("hasAuthority('disbursements.activities.update')")
     public ResponseEntity<DisbursementActivityResponse> updateActivity(
             @PathVariable("activity-id") UUID activityId,
             @RequestBody @Valid DisbursementActivityRequest request
@@ -46,6 +51,7 @@ public class DisbursementActivityController {
     }
 
     @DeleteMapping("/{activity-id}")
+    @PreAuthorize("hasAuthority('disbursements.activities.delete')")
     public ResponseEntity<Void> deleteActivity(@PathVariable("activity-id") UUID activityId) {
         disbursementActivityService.deleteActivity(activityId);
         return ResponseEntity.noContent().build();

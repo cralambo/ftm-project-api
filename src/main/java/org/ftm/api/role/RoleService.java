@@ -3,15 +3,13 @@ package org.ftm.api.role;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.common.PageResponse;
-import org.ftm.api.permission.Permission;
-import org.ftm.api.permission.PermissionRepository;
-import org.ftm.api.permission.RolePermission;
-import org.ftm.api.permission.RolePermissionId;
+import org.ftm.api.permission.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -79,6 +77,7 @@ public class RoleService {
         roleRepository.delete(role);
     }
 
+    @Transactional
     public String addPermissionToRole(UUID roleId, UUID permissionId) {
 
         Role role = roleRepository.findById(roleId)
@@ -103,10 +102,31 @@ public class RoleService {
         return roleRepository.save(role).getId().toString();
     }
 
+    @Transactional
     public String removePermissionToRole(UUID roleId, UUID permissionId) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new EntityNotFoundException("No role found with id: " + roleId));
         role.getRolePermissions().removeIf(rolePermission -> rolePermission.getPermission().getId().equals(permissionId));
         return roleRepository.save(role).getId().toString();
+    }
+
+    public List<RoleResponse> getAllRoles() {
+        List<Role> roles = roleRepository.findAll(Sort.by("createdDate").descending());
+        return roles.stream()
+                .map(RoleMapper::mapToRoleResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PermissionResponse> getRolePermissions(UUID roleId) {
+        Role role = roleRepository.findByIdWithPermissions(roleId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Role not found with id: " + roleId
+                ));
+        return role.getRolePermissions()
+                .stream()
+                .map(RolePermission::getPermission)
+                .map(PermissionMapper::mapToPermissionResponse)
+                .toList();
     }
 }

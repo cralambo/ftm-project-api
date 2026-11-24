@@ -1,13 +1,15 @@
 package org.ftm.api.report;
 
+import org.ftm.api.disbursement_schedule.DisbursementScheduleMapper;
+import org.ftm.api.partner_contact.PartnerContactMapper;
+
 public class PartnerReportMapper {
 
     public static PartnerReportResponse mapToPartnerReportResponse(PartnerReport report) {
         return PartnerReportResponse.builder()
                 .id(report.getId().toString())
-                .partner_contact_id(report.getPartnerContact().getId().toString())
-                .disbursement_schedule_id(report.getDisbursementSchedule().getId().toString())
-                .schedule_reference(report.getDisbursementSchedule().getReference())
+                .partner_contact(PartnerContactMapper.mapToPartnerContactResponse(report.getPartnerContact()))
+                .disbursement_schedule(DisbursementScheduleMapper.mapToShortDisbursementScheduleResponse(report.getDisbursementSchedule()))
                 .status(report.getStatus().toString())
                 .assigned_at(
                         report.getAssignedAt() != null

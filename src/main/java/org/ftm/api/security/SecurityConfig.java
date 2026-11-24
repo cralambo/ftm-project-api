@@ -35,45 +35,10 @@ public class SecurityConfig {
                         SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/auth/**", "/actuator/health").permitAll()
-                        .requestMatchers( "/users/**" )
-                        .authenticated()
-                        .requestMatchers( "/roles/**" )
-                        .authenticated()
-                        .requestMatchers( "/permissions/**" )
-                        .authenticated()
-                        .requestMatchers( "/regions/**" )
-                        .authenticated()
-                        .requestMatchers( "/districts/**" )
-                        .authenticated()
-                        .requestMatchers( "/municipalitites/**" )
-                        .authenticated()
-                        .requestMatchers( "/landscapes/**" )
-                        .authenticated()
-                        .requestMatchers( "/sub-landscapes/**" )
-                        .authenticated()
-                        .requestMatchers( "/departments/**" )
-                        .authenticated()
-                        .requestMatchers( "/positions/**" )
-                        .authenticated()
-                        .requestMatchers( "/employees/**" )
-                        .authenticated()
-                        .requestMatchers( "/board-members/**" )
-                        .authenticated()
-                        .requestMatchers( "/organizations/**" )
-                        .authenticated()
-                        .requestMatchers( "/partners/**" )
-                        .authenticated()
-                        .requestMatchers( "/partner-contacts/**" )
-                        .authenticated()
-                        .requestMatchers( "/strategic-plans/**" )
-                        .authenticated()
-                        .requestMatchers( "/topics/**" )
-                        .authenticated()
-                        .requestMatchers( "/co-funders/**" )
-                        .authenticated()
-                        .requestMatchers("/partner-reports/**")
-                        .authenticated()
+                        .requestMatchers(
+                                "/auth/**",
+                                "/actuator/health"
+                        ).permitAll()
                         .anyRequest()
                         .authenticated()
                 )
@@ -96,7 +61,12 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:3000", "http://localhost:5173", "http://localhost:4000", "http://192.168.88.64:4000")
+                List.of(
+                        "http://localhost:3000",
+                        "http://localhost:5173",
+                        "http://localhost:4000",
+                        "http://192.168.88.64:4000"
+                )
         );
 
         configuration.setAllowedMethods(

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ftm.api.common.PageResponse;
 import org.ftm.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,13 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('projects.create')")
     public ResponseEntity<String> createProject(@RequestBody ProjectRequest request) {
         return ResponseEntity.ok(projectService.createProject(request));
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('projects.view')")
     public ResponseEntity<PageResponse<ProjectResponse>> getProjects(
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,
             @RequestParam(name = "size", defaultValue = "10", required = false) int size
@@ -30,11 +33,13 @@ public class ProjectController {
     }
 
     @GetMapping("/{project-id}")
+    @PreAuthorize("hasAuthority('projects.view')")
     public ResponseEntity<ProjectDetailResponse> getProjectByID(@PathVariable("project-id") UUID projectId) {
         return ResponseEntity.ok(projectService.getProjectById(projectId));
     }
 
     @GetMapping("/partner")
+    @PreAuthorize("hasAuthority('projects.view')")
     public ResponseEntity<PageResponse<ProjectResponse>> getMyProjects(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestParam(name = "page", defaultValue = "0", required = false) int page,

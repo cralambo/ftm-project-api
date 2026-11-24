@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.ftm.api.common.PageResponse;
 import org.ftm.api.partner.SupportPartner;
 import org.ftm.api.partner.SupportPartnerRepository;
+import org.ftm.api.profile.PartnerContactProfileResponse;
 import org.ftm.api.user.User;
 import org.ftm.api.user.UserAccountService;
 import org.springframework.data.domain.Page;
@@ -98,5 +99,11 @@ public class PartnerContactService {
         final PartnerContact partnerContact = partnerContactRepository.findById(partnerContactId)
                 .orElseThrow(() -> new EntityNotFoundException("No partner contact found with id: " + partnerContactId));
         partnerContactRepository.delete(partnerContact);
+    }
+
+    public PartnerContactProfileResponse getByUserId(UUID userId) {
+        return partnerContactRepository.findByUserId(userId)
+                .map(PartnerContactMapper::mapToPartnerContactProfileResponse)
+                .orElseThrow(() -> new EntityNotFoundException("No partner contact found with user: " + userId));
     }
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.security.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ public class FinancialReportItemController {
     private final FinancialReportItemService financialReportItemService;
 
     @GetMapping("/financial-items")
+    @PreAuthorize("hasAuthority('financials.reports.view')")
     public ResponseEntity<List<FinancialReportItemResponse>> list(
             @PathVariable("report-id") UUID reportId,
             @AuthenticationPrincipal CustomUserDetails userDetails
@@ -26,6 +28,7 @@ public class FinancialReportItemController {
     }
 
     @PostMapping("/financial-reports")
+    @PreAuthorize("hasAuthority('financials.reports.create')")
     public ResponseEntity<FinancialReportItemResponse> createFinancialItem(
             @PathVariable("report-id") UUID reportId,
             @Valid @RequestBody CreateFinancialReportItemRequest request,
@@ -39,6 +42,7 @@ public class FinancialReportItemController {
     }
 
     @PutMapping("/fianncial-items/{item-id}")
+    @PreAuthorize("hasAuthority('financials.reports.update')")
     public ResponseEntity<FinancialReportItemResponse> updateFinancialItem(
             @PathVariable("report-id") UUID reportId,
             @PathVariable("item-id") UUID itemId,
@@ -54,6 +58,7 @@ public class FinancialReportItemController {
     }
 
     @DeleteMapping("/financial-items/{item-id}")
+    @PreAuthorize("hasAuthority('financials.reports.delete')")
     public ResponseEntity<Void> deleteFinancialItem(
             @PathVariable("report-id") UUID reportId,
             @PathVariable("item-id") UUID itemId,
@@ -64,6 +69,7 @@ public class FinancialReportItemController {
     }
 
     @GetMapping("/financial-summary")
+    @PreAuthorize("hasAuthority('financials.reports.view')")
     public ResponseEntity<FinancialSummaryDto> summary(
             @PathVariable("report-id") UUID reportId,
             @AuthenticationPrincipal CustomUserDetails userDetails
