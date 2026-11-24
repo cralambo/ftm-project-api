@@ -30,6 +30,18 @@ public class ProjectMapper {
                 .build();
     }
 
+    public static ShortProjectResponse mapToShortProjectResponse(Project project) {
+        return ShortProjectResponse.builder()
+                .id(project.getId().toString())
+                .agreement_number(project.getAgreementNumber())
+                .title(project.getTitle())
+                .start_date(project.getStartDate() != null ? project.getStartDate().toString() : null)
+                .end_date(project.getEndDate() != null ? project.getEndDate().toString() : null)
+                .status(project.getStatus().toString())
+                .granted_project(GrantedProjectMapper.mapToGrantedProjectResponse(project.getGrantedProject()))
+                .build();
+    }
+
     public static ProjectDetailResponse mapToProjectDetailResponse(Project project) {
         return ProjectDetailResponse.builder()
                 .id(project.getId().toString())

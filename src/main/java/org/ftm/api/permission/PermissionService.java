@@ -71,4 +71,12 @@ public class PermissionService {
                 .orElseThrow(() -> new EntityNotFoundException("No permission found with id: " + permissionId));
         permissionRepository.delete(permission);
     }
+
+    public List<PermissionResponse> getAllPermissions() {
+        List<Permission> permissions = permissionRepository.findAll(Sort.by("createdDate").descending());
+        return permissions
+                .stream()
+                .map(PermissionMapper::mapToPermissionResponse)
+                .toList();
+    }
 }

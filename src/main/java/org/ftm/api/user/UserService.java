@@ -2,7 +2,11 @@ package org.ftm.api.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.ftm.api.board_member.BoardMemberService;
 import org.ftm.api.common.PageResponse;
+import org.ftm.api.employee.EmployeeService;
+import org.ftm.api.partner_contact.PartnerContactService;
+import org.ftm.api.profile.CurrentUserResponse;
 import org.ftm.api.role.Role;
 import org.ftm.api.role.RoleRepository;
 import org.ftm.api.role.UserRole;
@@ -14,9 +18,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +33,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final EmployeeService employeeService;
+    private final BoardMemberService boardMemberService;
+    private final PartnerContactService partnerContactService;
 
     public PageResponse<UserResponse> getUsers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
@@ -86,6 +98,7 @@ public class UserService {
         return userRepository.save(user).getId().toString();
     }
 
+    @Transactional
     public String addRoleToUser(UUID userId, UUID roleId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("No user found with id: " + userId));
@@ -109,6 +122,7 @@ public class UserService {
         return userRepository.save(user).getId().toString();
     }
 
+    @Transactional
     public String removeRole(UUID userId, UUID roleId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("No user found with id: " + userId));
@@ -116,15 +130,71 @@ public class UserService {
         return userRepository.save(user).getId().toString();
     }
 
-    public UserResponse getCurrentUser(CustomUserDetails userDetails) {
+    public CurrentUserResponse getCurrentUser(CustomUserDetails userDetails) {
         if (userDetails == null) {
-            throw new AuthenticationCredentialsNotFoundException("Utilisateur non authentifié");
+            throw new AuthenticationCredentialsNotFoundException(
+                    "Utilisateur non athentifié"
+            );
         }
 
-        UUID userId = userDetails.getId();
+        User user = userRepository.findByIdWithRoles(userDetails.getId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Utilisateur introuvable"
+                ));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("No user found with id: " + userId));
-        return null;
+        Object profile = switch (user.getUserType()) {
+            case EMPLOYEE -> employeeService.getByUserId(user.getId());
+            case BOARD_MEMBER -> boardMemberService.getByUserId(user.getId());
+            case PARTNER_CONTACT -> partnerContactService.getByUserId(user.getId());
+            case ADMIN, USER -> null;
+        };
+
+        List<String> roles = user.getUserRoles().stream()
+                .map(userRole -> userRole.getRole().getName())
+                .toList();
+
+        return CurrentUserResponse.builder()
+                .id(user.getId().toString())
+                .email(user.getEmail())
+                .firstname(user.getFirstname())
+                .lastname(user.getLastname())
+                .enabled(user.isEnabled())
+                .roles(roles)
+                .userType(user.getUserType().toString())
+                .profile(profile)
+                .build();
     }
+
+    @Transactional(readOnly = true)
+    public PageResponse<UserDetailResponse> getAllUsersWithAuthorities(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+
+        Page<User> userPage = userRepository.findAllUsers(pageable);
+
+        List<UUID> userIds = userPage.getContent().stream()
+                .map(User::getId)
+                .toList();
+
+        Map<UUID, User> usersWithAuthorities = userRepository.findAllUserWithAuthorities(userIds)
+                .stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        List<UserDetailResponse> content = userPage.getContent()
+                .stream()
+                .map(user -> usersWithAuthorities.get(user.getId()))
+                .filter(Objects::nonNull)
+                .map(UserMapper::mapToUserDetailResponse)
+                .toList();
+
+        return PageResponse.<UserDetailResponse>builder()
+                .content(content)
+                .number(userPage.getNumber())
+                .size(userPage.getSize())
+                .totalElements(userPage.getTotalElements())
+                .totalPages(userPage.getTotalPages())
+                .first(userPage.isFirst())
+                .last(userPage.isLast())
+                .build();
+    }
+
 }

@@ -18,6 +18,8 @@ public interface PartnerReportRepository extends JpaRepository<PartnerReport, UU
 
     Page<PartnerReport> findByPartnerContactId(UUID partnerContactId, Pageable pageable);
     Page<PartnerReport> findByStatus(ReportStatus status, Pageable pageable);
+    Page<PartnerReport> findByStatusAndAssignedToIsNull(ReportStatus status, Pageable pageable);
+    Page<PartnerReport> findByAssignedToIdAndStatus(UUID assignedToId, ReportStatus status, Pageable pageable);
     Page<PartnerReport> findByAssignedToId(UUID assignedToId, Pageable pageable);
     Page<PartnerReport> findByStatusAndAssignedToId(
             ReportStatus status,
@@ -42,4 +44,11 @@ public interface PartnerReportRepository extends JpaRepository<PartnerReport, UU
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT r FROM PartnerReport r WHERE r.id = :id")
     Optional<PartnerReport> findByIdForUpdate(@Param("id") UUID id);
+
+    @EntityGraph(attributePaths = {
+            "disbursementSchedule",
+            "partnerContact",
+            "assignedTo"
+    })
+    Optional<PartnerReport> findByIdAndAssignedToIdAndStatus(UUID reportId, UUID assignedToId, ReportStatus status);
 }

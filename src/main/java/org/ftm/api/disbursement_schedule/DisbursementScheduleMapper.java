@@ -60,4 +60,32 @@ public class DisbursementScheduleMapper {
                 .project(ProjectMapper.mapToProjectResponse(schedule.getProject()))
                 .build();
     }
+
+    public static ShortDisbursementScheduleResponse mapToShortDisbursementScheduleResponse(DisbursementSchedule schedule){
+        return ShortDisbursementScheduleResponse.builder()
+                .id(schedule.getId().toString())
+                .reference(schedule.getReference())
+                .disbursement_month(
+                        schedule.getDisbursementMonth() != null
+                                ? schedule.getDisbursementMonth().toString()
+                                : null
+                )
+                .disbursement_amount(
+                        schedule.getDisbursementAmount() != null
+                                ? schedule.getDisbursementAmount().toPlainString()
+                                : null
+                )
+                .percentage(
+                        schedule.getPercentage() != null
+                                ? schedule.getPercentage().toPlainString()
+                                : null
+                )
+                .report_submission_date(
+                        schedule.getReportSubmissionDate() != null
+                                ? schedule.getReportSubmissionDate().toString()
+                                : null
+                )
+                .project(ProjectMapper.mapToShortProjectResponse(schedule.getProject()))
+                .build();
+    }
 }

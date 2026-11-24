@@ -5,20 +5,26 @@ import org.ftm.api.common.PageResponse;
 import org.ftm.api.disbursement_activity.DisbursementActivity;
 import org.ftm.api.disbursement_activity.DisbursementActivityRepository;
 import org.ftm.api.disbursement_schedule.DisbursementSchedule;
+import org.ftm.api.disbursement_schedule.DisbursementScheduleMapper;
 import org.ftm.api.disbursement_schedule.DisbursementScheduleRepository;
 import org.ftm.api.partner_contact.PartnerContact;
+import org.ftm.api.partner_contact.PartnerContactMapper;
 import org.ftm.api.security.CustomUserDetails;
 import org.ftm.api.user.User;
+import org.ftm.api.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +35,9 @@ public class PartnerReportService {
     private final ReportStatusHistoryRepository reportStatusHistoryRepository;
     private final DisbursementActivityRepository disbursementActivityRepository;
     private final TechnicalReportItemRepository technicalReportItemRepository;
+    private final FinancialReportItemRepository financialReportItemRepository;
+    private final ReportAttachmentRepository reportAttachmentRepository;
+    private final UserRepository userRepository;
 
     private final ReportCommonService reportCommonService;
     private final FinancialSummaryService financialSummaryService;
@@ -208,24 +217,12 @@ public class PartnerReportService {
             SubmitPartnerReportRequest request,
             CustomUserDetails userDetails
     ) {
-        System.out.println("========== SUBMIT REPORT START ==========");
-        System.out.println("Report ID: " + reportId);
-
         try {
             User actor = reportCommonService.getCurrentUser(userDetails);
-            System.out.println("STEP 1 OK - User: " + actor.getId());
 
-            PartnerReport report =
-                    reportCommonService.getReportForUpdate(reportId);
-            System.out.println("STEP 2 OK - Report: " + report.getId());
-
-            System.out.println("Report status: " + report.getStatus());
-
+            PartnerReport report = reportCommonService.getReportForUpdate(reportId);
             reportCommonService.ensureOwner(report, actor);
-            System.out.println("STEP 3 OK - Owner verified");
-
             reportCommonService.ensureEditable(report);
-            System.out.println("STEP 4 OK - Editable verified");
 
             if (request.general_comments() != null) {
                 report.setGeneralComments(
@@ -233,27 +230,18 @@ public class PartnerReportService {
                 );
             }
 
-            System.out.println("STEP 5 OK - General comments");
-
             validateTechnicalReport(report);
-            System.out.println("STEP 6 OK - Technical validation");
 
-            reportAttachmentService
-                    .validateRequiredGeneralAttachments(reportId);
-            System.out.println("STEP 7 OK - Attachments validation");
+            reportAttachmentService.validateRequiredGeneralAttachments(reportId);
 
-            financialSummaryService
-                    .validateBudgetForSubmission(reportId);
-            System.out.println("STEP 8 OK - Budget validation");
+            financialSummaryService.validateBudgetForSubmission(reportId);
 
             ReportStatus previousStatus = report.getStatus();
 
             report.setStatus(ReportStatus.SUBMITTED);
+            report.setSubmittedAt(LocalDateTime.now());
 
-            PartnerReport savedReport =
-                    partnerReportRepository.saveAndFlush(report);
-
-            System.out.println("STEP 9 OK - Report saved");
+            PartnerReport savedReport = partnerReportRepository.saveAndFlush(report);
 
             saveHistory(
                     savedReport,
@@ -263,11 +251,7 @@ public class PartnerReportService {
                     "Soumission du rapport par le partenaire."
             );
 
-            System.out.println("STEP 10 OK - History saved");
-
-            return PartnerReportMapper.mapToPartnerReportResponse(
-                    savedReport
-            );
+            return PartnerReportMapper.mapToPartnerReportResponse(savedReport);
 
         } catch (Exception e) {
             System.err.println("========== SUBMIT REPORT ERROR ==========");
@@ -319,7 +303,154 @@ public class PartnerReportService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public PageResponse<PartnerReportResponse> getPartnerReportSubmittedAndAssignedToIsNull(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("submittedAt").ascending());
+        Page<PartnerReport> reports = partnerReportRepository.findByStatusAndAssignedToIsNull(
+                ReportStatus.SUBMITTED,
+                pageable
+        );
+        List<PartnerReportResponse> content = reports.stream()
+                .map(PartnerReportMapper::mapToPartnerReportResponse)
+                .toList();
+        return PageResponse.<PartnerReportResponse>builder()
+                .content(content)
+                .number(reports.getNumber())
+                .size(reports.getSize())
+                .totalElements(reports.getTotalElements())
+                .totalPages(reports.getTotalPages())
+                .first(reports.isFirst())
+                .last(reports.isLast())
+                .build();
+    }
+
+    @Transactional
+    public PartnerReportResponse assignReportToMe(UUID reportId, CustomUserDetails currentUser) {
+        PartnerReport report = partnerReportRepository.findByIdForUpdate(reportId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_CONTENT,
+                        "Rapport introuvable"
+                ));
+        if (report.getStatus() != ReportStatus.SUBMITTED) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_CONTENT,
+                    "Seuls les rapports soumis peuvent être assignés."
+            );
+        }
+        if (report.getAssignedTo() != null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_CONTENT,
+                    "Ce rapport est déjà assigné à un utilisateur."
+            );
+        }
+
+        User actor = userRepository.findById(currentUser.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNPROCESSABLE_CONTENT,
+                        "Rapport introuvable"
+                ));
+
+        report.setAssignedTo(actor);
+        report.setAssignedAt(LocalDateTime.now());
+        report.setStatus(ReportStatus.UNDER_REVIEW);
+
+        PartnerReport savedReport = partnerReportRepository.save(report);
+        return PartnerReportMapper.mapToPartnerReportResponse(savedReport);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<PartnerReportResponse> getReportsToMe(int page, int size, CustomUserDetails currentUser) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("assignedAt").ascending());
+        Page<PartnerReport> reports = partnerReportRepository.findByAssignedToIdAndStatus(
+                currentUser.getId(),
+                ReportStatus.UNDER_REVIEW,
+                pageable
+        );
+        List<PartnerReportResponse> content = reports.stream()
+                .map(PartnerReportMapper::mapToPartnerReportResponse)
+                .toList();
+        return PageResponse.<PartnerReportResponse>builder()
+                .content(content)
+                .number(reports.getNumber())
+                .size(reports.getSize())
+                .totalElements(reports.getTotalElements())
+                .totalPages(reports.getTotalPages())
+                .first(reports.isFirst())
+                .last(reports.isLast())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public PartnerReportUnderReviewResponse getAssignedReport(UUID reportId, CustomUserDetails currentUser) {
+        PartnerReport report = partnerReportRepository.findByIdAndAssignedToIdAndStatus(
+                reportId,
+                currentUser.getId(),
+                ReportStatus.UNDER_REVIEW
+        ).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.UNPROCESSABLE_CONTENT,
+                "Rapport introuvable ou non assigné à cet utilisateur"
+        ));
+
+        List<TechnicalReportItem> technicalReportItems = technicalReportItemRepository.findByPartnerReportId(reportId);
+        List<FinancialReportItem> financialReportItems = financialReportItemRepository.findByPartnerReportId(reportId);
+
+        List<ReportAttachment> attachments = reportAttachmentRepository.findByPartnerReportId(reportId);
+
+        List<ReportAttachmentResponse> generalDocuments = attachments.stream()
+                .filter(attachment -> attachment.getTechnicalReportItem() == null
+                        && attachment.getFinancialReportItem() == null
+                )
+                .map(ReportAttachmentMapper::toAttachmentResponse)
+                .toList();
+
+        // Construire le rapport technique
+        List<TechnicalReportItemWithAttachmentResponse> technicalItems = technicalReportItems
+                .stream()
+                .map(item ->{
+                    List<ReportAttachmentResponse> documents = attachments
+                            .stream()
+                            .filter(attachment -> attachment.getTechnicalReportItem() != null
+                                    && attachment.getTechnicalReportItem()
+                                    .getId().equals(item.getId())
+                            )
+                            .map(ReportAttachmentMapper::toAttachmentResponse)
+                            .toList();
+                    return TechnicalReportItemMapper.mapToTechnicalReportItemWithAttachmentResponse(item, documents);
+                })
+                .toList();
+
+        // Construire le rapport financier
+        List<FinancialReportItemWithAttachmentResponse> financialItems = financialReportItems
+                .stream()
+                .map(item -> {
+                    List<ReportAttachmentResponse> documents = attachments.stream()
+                            .filter(attachment -> attachment.getFinancialReportItem() != null
+                                    && attachment.getFinancialReportItem()
+                                    .getId().equals(item.getId())
+                            )
+                            .map(ReportAttachmentMapper::toAttachmentResponse)
+                            .toList();
+                    return FinancialReportItemMapper.mapToFinancialReportItemWithAttachmentResponse(item, documents);
+                })
+                .toList();
+
+        return PartnerReportUnderReviewResponse.builder()
+                .id(report.getId().toString())
+                .disbursement_schedule(DisbursementScheduleMapper.mapToShortDisbursementScheduleResponse(report.getDisbursementSchedule()))
+                .partner_contact(PartnerContactMapper.mapToPartnerContactResponse(report.getPartnerContact()))
+                .status(report.getStatus().name())
+                .general_comments(report.getGeneralComments())
+                .assigned_at(report.getAssignedAt() == null ? null : report.getAssignedAt().toString())
+                .assigned_to(report.getAssignedTo().getFirstname() + " " + report.getAssignedTo().getLastname())
+                .submitted_at(report.getSubmittedAt() == null ? null : report.getSubmittedAt().toString())
+                .technical_report(technicalItems)
+                .financial_report(financialItems)
+                .documents(generalDocuments)
+                .build();
+    }
+
     // inside method
+
     private void saveHistory(
             PartnerReport report,
             ReportStatus previous,

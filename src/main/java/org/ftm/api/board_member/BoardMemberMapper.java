@@ -1,5 +1,7 @@
 package org.ftm.api.board_member;
 
+import org.ftm.api.profile.BoardMemberProfileResponse;
+
 import java.time.LocalDate;
 
 public class BoardMemberMapper {
@@ -23,6 +25,29 @@ public class BoardMemberMapper {
 
     public static BoardMemberResponse mapToBoardMemberResponse(BoardMember boardMember) {
         return BoardMemberResponse.builder()
+                .id(boardMember.getId().toString())
+                .firstname(boardMember.getFirstname())
+                .lastname(boardMember.getLastname())
+                .personal_email(boardMember.getPersonalEmail())
+                .professional_email(boardMember.getProfessionalEmail())
+                .position(boardMember.getPosition())
+                .phone(boardMember.getPhone())
+                .address(boardMember.getAddress())
+                .appointment_date(
+                        boardMember.getAppointmentDate() != null
+                                ? boardMember.getAppointmentDate().toString()
+                                : null
+                )
+                .end_date(
+                        boardMember.getEndDate() != null
+                                ? boardMember.getEndDate().toString()
+                                : null
+                )
+                .build();
+    }
+
+    public static BoardMemberProfileResponse mapToBoardMemberProfileResponse(BoardMember boardMember) {
+        return BoardMemberProfileResponse.builder()
                 .id(boardMember.getId().toString())
                 .firstname(boardMember.getFirstname())
                 .lastname(boardMember.getLastname())

@@ -3,6 +3,7 @@ package org.ftm.api.board_member;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.ftm.api.common.PageResponse;
+import org.ftm.api.profile.BoardMemberProfileResponse;
 import org.ftm.api.user.User;
 import org.ftm.api.user.UserAccountService;
 import org.springframework.data.domain.Page;
@@ -83,5 +84,11 @@ public class BoardMemberService {
         final BoardMember boardMember = boardMemberRepository.findById(boardMemberId)
                 .orElseThrow(() -> new EntityNotFoundException("No board member found with id: " + boardMemberId));
         boardMemberRepository.delete(boardMember);
+    }
+
+    public BoardMemberProfileResponse getByUserId(UUID userId) {
+        return boardMemberRepository.findByUserId(userId)
+                .map(BoardMemberMapper::mapToBoardMemberProfileResponse)
+                .orElseThrow(() -> new EntityNotFoundException("No board member found with user :: " + userId));
     }
 }
